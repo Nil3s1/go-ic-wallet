@@ -10,7 +10,7 @@ import (
 type JourneyLog struct {
 	kernel.BaseAggregate
 
-	predecessorId     string
+	predecessorCardNo string
 	isOnJourney       bool
 	startStation      string
 	startTime         time.Time
@@ -24,7 +24,7 @@ func NewJourneyLog(cardNo string) (*JourneyLog, error) {
 	return NewJourneyLogWithPredecessor(cardNo, "")
 }
 
-func NewJourneyLogWithPredecessor(cardNo string, predecessorId string) (*JourneyLog, error) {
+func NewJourneyLogWithPredecessor(cardNo string, predecessorCardNo string) (*JourneyLog, error) {
 	if cardNo == "" {
 		return nil, errors.New("cannot create journey log: cardNo is empty")
 	}
@@ -32,29 +32,26 @@ func NewJourneyLogWithPredecessor(cardNo string, predecessorId string) (*Journey
 	createdAt := time.Now().UTC()
 
 	event := JourneyLogCreatedDomainEvent{
-		CardNo:        cardNo,
-		CreatedAt:     createdAt,
-		PredecessorId: predecessorId,
+		CardNo:            cardNo,
+		CreatedAt:         createdAt,
+		PredecessorCardNo: predecessorCardNo,
 	}
 
 	jl := &JourneyLog{}
-	jl.applyEvent(event)
+	jl.ApplyEvent(event, jl.applyEventFunction)
 
 	return jl, nil
 }
 
 func Rehydrate(events []kernel.DomainEvent) *JourneyLog {
 	jl := &JourneyLog{}
-	for _, e := range events {
-		jl.applyEvent(e)
-	}
+	jl.LoadFromHistory(events, jl.applyEventFunction)
 
-	jl.ClearUncommittedEvents()
 	return jl
 }
 
-func (jl *JourneyLog) PredecessorId() string {
-	return jl.predecessorId
+func (jl *JourneyLog) PredecessorCardNo() string {
+	return jl.predecessorCardNo
 }
 
 func (jl *JourneyLog) CardNo() string {
@@ -104,7 +101,7 @@ func (jl *JourneyLog) StartJourney(startStation string) error {
 		StartTime:    startTime,
 	}
 
-	jl.applyEvent(event)
+	jl.ApplyEvent(event, jl.applyEventFunction)
 
 	return nil
 }
@@ -127,16 +124,16 @@ func (jl *JourneyLog) EndJourney(endStation string, cf CalculatedFare) error {
 		Fare:              cf.Fare(),
 	}
 
-	jl.applyEvent(event)
+	jl.ApplyEvent(event, jl.applyEventFunction)
 	return nil
 }
 
-func (jl *JourneyLog) applyEvent(event kernel.DomainEvent) {
+func (jl *JourneyLog) applyEventFunction(event kernel.DomainEvent) {
 	switch e := event.(type) {
 	case JourneyLogCreatedDomainEvent:
 		jl.SetId(e.CardNo)
 		jl.SetCreatedAt(e.CreatedAt)
-		jl.predecessorId = e.PredecessorId
+		jl.predecessorCardNo = e.PredecessorCardNo
 		jl.isOnJourney = false
 	case JourneyStartedDomainEvent:
 		jl.isOnJourney = true
@@ -153,6 +150,4 @@ func (jl *JourneyLog) applyEvent(event kernel.DomainEvent) {
 		jl.distanceTravelled = e.DistanceTravelled
 		jl.fare = e.Fare
 	}
-
-	jl.AddEvent(event)
 }

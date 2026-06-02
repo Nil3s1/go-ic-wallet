@@ -9,10 +9,10 @@ const (
 )
 
 type CardCreatedDomainEvent struct {
-	Id        string
-	CardNo    string
-	CreatedAt time.Time
-	ValidTo   time.Time
+	CardNo         string
+	InitialBalance int
+	CreatedAt      time.Time
+	ValidTo        time.Time
 }
 
 type BalanceAddedDomainEvent struct {

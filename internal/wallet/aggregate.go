@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/Nil3s1/go-ic-wallet/internal/kernel"
-	"github.com/google/uuid"
 )
 
 type Card struct {
@@ -19,7 +18,7 @@ type Card struct {
 
 }
 
-func NewCard() (*Card, error) {
+func NewCard(initialBalance int) (*Card, error) {
 	cardNo, err := generateCardNo()
 
 	if err != nil {
@@ -30,26 +29,27 @@ func NewCard() (*Card, error) {
 	validTo := createdAt.AddDate(5, 0, 0)
 
 	event := CardCreatedDomainEvent{
-		Id:        uuid.NewString(),
-		CardNo:    cardNo,
-		CreatedAt: createdAt,
-		ValidTo:   validTo,
+		CardNo:         cardNo,
+		InitialBalance: initialBalance,
+		CreatedAt:      createdAt,
+		ValidTo:        validTo,
 	}
 
 	card := &Card{}
-	card.applyEvent(event)
+	card.applyEventFunction(event)
 
 	return card, nil
 }
 
 func Rehydrate(events []kernel.DomainEvent) *Card {
 	card := &Card{}
-	for _, e := range events {
-		card.applyEvent(e)
-	}
+	card.LoadFromHistory(events, card.applyEventFunction)
 
-	card.ClearUncommittedEvents()
 	return card
+}
+
+func (c *Card) CardNo() string {
+	return c.cardNo
 }
 
 func (c *Card) ValidTo() time.Time {
@@ -69,7 +69,7 @@ func (c *Card) AddBalance(value int) error {
 		BalanceAdded: int(value),
 	}
 
-	c.applyEvent(event)
+	c.ApplyEvent(event, c.applyEventFunction)
 
 	return nil
 }
@@ -82,27 +82,25 @@ func (c *Card) DeductFare(value int) error {
 		DeductedFare: int(value),
 	}
 
-	c.applyEvent(event)
+	c.ApplyEvent(event, c.applyEventFunction)
 
 	return nil
 }
 
-func (c *Card) applyEvent(event kernel.DomainEvent) {
+func (c *Card) applyEventFunction(event kernel.DomainEvent) {
 	switch e := event.(type) {
 	case CardCreatedDomainEvent:
-		c.SetId(e.Id)
+		c.SetId(e.CardNo)
 		c.cardNo = e.CardNo
 		c.SetCreatedAt(e.CreatedAt)
 		c.validTo = e.ValidTo
-		c.currentBalance = 0
+		c.currentBalance = e.InitialBalance
 	case BalanceAddedDomainEvent:
 		c.currentBalance += e.BalanceAdded
 	case FareDeductedDomainEvent:
 		c.currentBalance -= e.DeductedFare
 	default:
 	}
-
-	c.AddEvent(event)
 }
 
 func generateCardNo() (string, error) {
