@@ -43,7 +43,7 @@ func NewCard(initialBalance int) (*Card, error) {
 
 func Rehydrate(events []kernel.DomainEvent) *Card {
 	card := &Card{}
-	card.LoadFromHistory(events, card.applyEventFunction)
+	card.BaseAggregate.LoadFromHistory(events, card.applyEventFunction)
 
 	return card
 }
