@@ -18,16 +18,20 @@ type StationProvider interface {
 	GetStationInfo(stationId string) (StationInfo, error)
 }
 
-func CalculateFare(provider StationProvider, start string, end string) (cf CalculatedFare, err error) {
+type FareCalculator struct {
+	provider StationProvider
+}
+
+func (fc *FareCalculator) CalculateFare(start string, end string) (cf CalculatedFare, err error) {
 	baseFare := 200
 	farePerDistance := 10
 	fare := 0
-	startInfo, err := provider.GetStationInfo(start)
+	startInfo, err := fc.provider.GetStationInfo(start)
 	if err != nil {
 		return CalculatedFare{}, err
 	}
 
-	endInfo, err := provider.GetStationInfo(end)
+	endInfo, err := fc.provider.GetStationInfo(end)
 	if err != nil {
 		return CalculatedFare{}, err
 	}

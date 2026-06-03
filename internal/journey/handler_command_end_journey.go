@@ -7,12 +7,14 @@ import (
 )
 
 type EndJourneyCommandHandler struct {
-	store kernel.EventStore[*JourneyLog]
+	store      kernel.EventStore[*JourneyLog]
+	calculator FareCalculator
 }
 
-func NewEndJourneyCommandHandler(store kernel.EventStore[*JourneyLog]) *EndJourneyCommandHandler {
+func NewEndJourneyCommandHandler(store kernel.EventStore[*JourneyLog], calculator FareCalculator) *EndJourneyCommandHandler {
 	return &EndJourneyCommandHandler{
-		store: store,
+		store:      store,
+		calculator: calculator,
 	}
 }
 
@@ -23,7 +25,13 @@ func (h *EndJourneyCommandHandler) Handle(ctx context.Context, cmd EndJourneyCom
 		return err
 	}
 
-	err = jl.StartJourney(cmd.EndStation)
+	cf, err := h.calculator.CalculateFare(jl.StartStation(), cmd.EndStation)
+
+	if err != nil {
+		return err
+	}
+
+	err = jl.EndJourney(cmd.EndStation, cf)
 
 	if err != nil {
 		return err
