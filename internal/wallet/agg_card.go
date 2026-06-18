@@ -18,6 +18,10 @@ type Card struct {
 
 }
 
+func hasSufficientBalance(currentBalance int, amount int) bool {
+	return currentBalance >= amount
+}
+
 func NewCard(initialBalance int) (*Card, error) {
 	cardNo, err := generateCardNo()
 
@@ -75,7 +79,7 @@ func (c *Card) AddBalance(value int) error {
 }
 
 func (c *Card) DeductFare(value int) error {
-	if c.currentBalance < value {
+	if hasSufficientBalance(c.currentBalance, value) {
 		return errors.New("nicht genug Blance auf der Karte. Bitte Karte aufladen!")
 	}
 	event := FareDeductedDomainEvent{

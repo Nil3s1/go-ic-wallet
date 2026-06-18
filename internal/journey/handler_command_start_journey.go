@@ -7,16 +7,19 @@ import (
 )
 
 type StartJourneyCommandHandler struct {
-	store kernel.EventStore[*JourneyLog]
+	store    kernel.EventStore[*JourneyLog]
+	provider CardProvider
 }
 
-func NewStartJourneyCommandHandler(store kernel.EventStore[*JourneyLog]) *StartJourneyCommandHandler {
+func NewStartJourneyCommandHandler(provider CardProvider, store kernel.EventStore[*JourneyLog]) *StartJourneyCommandHandler {
 	return &StartJourneyCommandHandler{
-		store: store,
+		store:    store,
+		provider: provider,
 	}
 }
 
 func (h *StartJourneyCommandHandler) Handle(ctx context.Context, cmd StartJourneyCommand) error {
+	CardHasSufficientBalance(h.provider, cmd.CardNo, BaseFare)
 	jl, err := h.store.Load(ctx, cmd.CardNo)
 
 	if err != nil {

@@ -1,5 +1,7 @@
 package journey
 
+const BaseFare = 200
+
 type CalculatedFare struct {
 	fare     int
 	distance int
@@ -8,22 +10,11 @@ type CalculatedFare struct {
 func (v CalculatedFare) Fare() int     { return v.fare }
 func (v CalculatedFare) Distance() int { return v.distance }
 
-type StationInfo struct {
-	StationId     string
-	SequenceOrder int
-	TrackPosition int
-}
-
-type StationProvider interface {
-	GetStationInfo(stationId string) (StationInfo, error)
-}
-
 type FareCalculator struct {
 	provider StationProvider
 }
 
 func (fc *FareCalculator) CalculateFare(start string, end string) (cf CalculatedFare, err error) {
-	baseFare := 200
 	farePerDistance := 10
 	fare := 0
 	startInfo, err := fc.provider.GetStationInfo(start)
@@ -42,7 +33,7 @@ func (fc *FareCalculator) CalculateFare(start string, end string) (cf Calculated
 		distance = -distance
 	}
 
-	fare = baseFare + (farePerDistance * distance)
+	fare = BaseFare + (farePerDistance * distance)
 
 	calculatedFare := CalculatedFare{
 		fare:     fare,
