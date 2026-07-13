@@ -80,7 +80,7 @@ func (c *Card) AddBalance(value int) error {
 
 func (c *Card) DeductFare(value int) error {
 	if hasSufficientBalance(c.currentBalance, value) {
-		return errors.New("nicht genug Blance auf der Karte. Bitte Karte aufladen!")
+		return errors.New("nicht genug Balance auf der Karte. Bitte Karte aufladen!")
 	}
 	event := FareDeductedDomainEvent{
 		DeductedFare: int(value),

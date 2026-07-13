@@ -2,6 +2,7 @@ package journey
 
 import (
 	"context"
+	"errors"
 
 	"github.com/Nil3s1/go-ic-wallet/internal/kernel"
 )
@@ -19,7 +20,16 @@ func NewStartJourneyCommandHandler(provider CardProvider, store kernel.EventStor
 }
 
 func (h *StartJourneyCommandHandler) Handle(ctx context.Context, cmd StartJourneyCommand) error {
-	CardHasSufficientBalance(h.provider, cmd.CardNo, BaseFare)
+	result, err := CardHasSufficientBalance(h.provider, cmd.CardNo, BaseFare)
+
+	if err != nil {
+		return err
+	}
+
+	if result == false {
+		return errors.New("Insufficient Baance to Start the Journey")
+	}
+
 	jl, err := h.store.Load(ctx, cmd.CardNo)
 
 	if err != nil {
