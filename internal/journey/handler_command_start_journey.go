@@ -27,7 +27,7 @@ func (h *StartJourneyCommandHandler) Handle(ctx context.Context, cmd StartJourne
 	}
 
 	if result == false {
-		return errors.New("Insufficient Baance to Start the Journey")
+		return errors.New("Insufficient Balance to Start the Journey")
 	}
 
 	jl, err := h.store.Load(ctx, cmd.CardNo)
