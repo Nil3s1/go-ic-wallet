@@ -14,6 +14,12 @@ type FareCalculator struct {
 	provider StationProvider
 }
 
+func NewFareCalculator(provider StationProvider) *FareCalculator {
+	return &FareCalculator{
+		provider: provider,
+	}
+}
+
 func (fc *FareCalculator) CalculateFare(start string, end string) (cf CalculatedFare, err error) {
 	farePerDistance := 10
 	fare := 0
