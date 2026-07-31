@@ -10,7 +10,7 @@ type AddBalanceCommand struct {
 	Amount int
 }
 
-type DeductFareCommand struct {
+type ApplyPaymentCommand struct {
 	CardNo string
 	Amount int
 }

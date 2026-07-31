@@ -4,7 +4,7 @@ import "time"
 
 const (
 	EventBalanceAdded = "BalanceAddedDomainEvent"
-	EventFareDeducted = "FareDeductedDomainEvent"
+	EventApplyPayment = "ApplyPaymentDomainEvent"
 	EventCardCreated  = "CardCreatedDomainEvent"
 )
 
@@ -19,8 +19,8 @@ type BalanceAddedDomainEvent struct {
 	BalanceAdded int
 }
 
-type FareDeductedDomainEvent struct {
-	DeductedFare int
+type ApplyPaymentDomainEvent struct {
+	Amount int
 }
 
 func (e CardCreatedDomainEvent) EventName() string {
@@ -31,6 +31,6 @@ func (e BalanceAddedDomainEvent) EventName() string {
 	return EventBalanceAdded
 }
 
-func (e FareDeductedDomainEvent) EventName() string {
-	return EventFareDeducted
+func (e ApplyPaymentDomainEvent) EventName() string {
+	return EventApplyPayment
 }

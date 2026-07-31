@@ -3,7 +3,7 @@ package wallet
 import (
 	"context"
 
-	"github.com/Nil3s1/go-ic-wallet/internal/kernel"
+	"github.com/Nil3s1/go-ic-wallet/internal/modules/kernel"
 )
 
 type CreateCardCommandHandler struct {

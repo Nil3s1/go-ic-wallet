@@ -6,7 +6,7 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/Nil3s1/go-ic-wallet/internal/kernel"
+	"github.com/Nil3s1/go-ic-wallet/internal/modules/kernel"
 )
 
 type Card struct {
@@ -78,12 +78,12 @@ func (c *Card) AddBalance(value int) error {
 	return nil
 }
 
-func (c *Card) DeductFare(value int) error {
-	if hasSufficientBalance(c.currentBalance, value) {
+func (c *Card) ApplyPayment(amount int) error {
+	if !hasSufficientBalance(c.currentBalance, amount) {
 		return errors.New("nicht genug Balance auf der Karte. Bitte Karte aufladen!")
 	}
-	event := FareDeductedDomainEvent{
-		DeductedFare: int(value),
+	event := ApplyPaymentDomainEvent{
+		Amount: int(amount),
 	}
 
 	c.ApplyEvent(event, c.applyEventFunction)
@@ -101,8 +101,8 @@ func (c *Card) applyEventFunction(event kernel.DomainEvent) {
 		c.currentBalance = e.InitialBalance
 	case BalanceAddedDomainEvent:
 		c.currentBalance += e.BalanceAdded
-	case FareDeductedDomainEvent:
-		c.currentBalance -= e.DeductedFare
+	case ApplyPaymentDomainEvent:
+		c.currentBalance -= e.Amount
 	default:
 	}
 }
