@@ -3,7 +3,7 @@ package journey
 import (
 	"context"
 
-	"github.com/Nil3s1/go-ic-wallet/internal/kernel"
+	"github.com/Nil3s1/go-ic-wallet/internal/modules/kernel"
 )
 
 type CreateJourneyLogCommandHandler struct {

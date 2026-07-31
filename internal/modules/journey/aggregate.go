@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/Nil3s1/go-ic-wallet/internal/kernel"
+	"github.com/Nil3s1/go-ic-wallet/internal/modules/kernel"
 )
 
 type JourneyLog struct {
