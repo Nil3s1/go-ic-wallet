@@ -11,6 +11,7 @@ type AddBalanceCommand struct {
 }
 
 type ApplyPaymentCommand struct {
-	CardNo string
-	Amount int
+	CardNo      string
+	Amount      int
+	ReferenceId string
 }

@@ -2,7 +2,7 @@ package wallet
 
 import "time"
 
-type CardModel struct {
+type CardProjection struct {
 	CardNo         string
 	ValidTo        time.Time
 	CurrentBalance int //Currency in cents

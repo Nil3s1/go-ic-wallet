@@ -6,16 +6,17 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/Nil3s1/go-ic-wallet/internal/modules/kernel"
+	"github.com/Nil3s1/go-ic-wallet/internal/kernel"
+	"github.com/google/uuid"
 )
 
 type Card struct {
 	kernel.BaseAggregate
 
-	cardNo         string
-	validTo        time.Time
-	currentBalance int //Currency in cents
-
+	cardNo                string
+	validTo               time.Time
+	currentBalance        int //Currency in cents
+	processedReferenceIds map[string]bool
 }
 
 func hasSufficientBalance(currentBalance int, amount int) bool {
@@ -39,14 +40,14 @@ func NewCard(initialBalance int) (*Card, error) {
 		ValidTo:        validTo,
 	}
 
-	card := &Card{}
+	card := &Card{processedReferenceIds: make(map[string]bool)}
 	card.applyEventFunction(event)
 
 	return card, nil
 }
 
 func Rehydrate(events []kernel.DomainEvent) *Card {
-	card := &Card{}
+	card := &Card{processedReferenceIds: make(map[string]bool)}
 	card.BaseAggregate.LoadFromHistory(events, card.applyEventFunction)
 
 	return card
@@ -69,8 +70,11 @@ func (c *Card) AddBalance(value int) error {
 		return errors.New("Betrag muss größer als 0 sein")
 	}
 
+	generatedReferenceID := uuid.New().String()
+
 	event := BalanceAddedDomainEvent{
 		BalanceAdded: int(value),
+		ReferenceId:  generatedReferenceID,
 	}
 
 	c.ApplyEvent(event, c.applyEventFunction)
@@ -78,12 +82,14 @@ func (c *Card) AddBalance(value int) error {
 	return nil
 }
 
-func (c *Card) ApplyPayment(amount int) error {
+func (c *Card) ApplyPayment(amount int, referenceID string) error {
 	if !hasSufficientBalance(c.currentBalance, amount) {
 		return errors.New("nicht genug Balance auf der Karte. Bitte Karte aufladen!")
 	}
+
 	event := ApplyPaymentDomainEvent{
-		Amount: int(amount),
+		Amount:      int(amount),
+		ReferenceId: referenceID,
 	}
 
 	c.ApplyEvent(event, c.applyEventFunction)
@@ -103,6 +109,9 @@ func (c *Card) applyEventFunction(event kernel.DomainEvent) {
 		c.currentBalance += e.BalanceAdded
 	case ApplyPaymentDomainEvent:
 		c.currentBalance -= e.Amount
+		if e.ReferenceId != "" {
+			c.processedReferenceIds[e.ReferenceId] = true
+		}
 	default:
 	}
 }

@@ -4,20 +4,22 @@ import (
 	"errors"
 	"time"
 
-	"github.com/Nil3s1/go-ic-wallet/internal/modules/kernel"
+	"github.com/Nil3s1/go-ic-wallet/internal/kernel"
+	"github.com/google/uuid"
 )
 
 type JourneyLog struct {
 	kernel.BaseAggregate
 
-	predecessorCardNo string
-	isOnJourney       bool
-	startStation      string
-	startTime         time.Time
-	endStation        string
-	endTime           time.Time
-	distanceTravelled int
-	fare              int
+	predecessorCardNo  string
+	isOnJourney        bool
+	journeyReferenceId string
+	startStation       string
+	startTime          time.Time
+	endStation         string
+	endTime            time.Time
+	distanceTravelled  int
+	fare               int
 }
 
 func NewJourneyLog(cardNo string) (*JourneyLog, error) {
@@ -62,6 +64,10 @@ func (jl *JourneyLog) IsOnJourney() bool {
 	return jl.isOnJourney
 }
 
+func (jl *JourneyLog) JourneyReferenceId() string {
+	return jl.journeyReferenceId
+}
+
 func (jl *JourneyLog) StartStation() string {
 	return jl.startStation
 }
@@ -95,10 +101,12 @@ func (jl *JourneyLog) StartJourney(startStation string) error {
 	}
 
 	startTime := time.Now().UTC()
+	referenceId := uuid.New().String()
 
 	event := JourneyStartedDomainEvent{
-		StartStation: startStation,
-		StartTime:    startTime,
+		StartStation:       startStation,
+		StartTime:          startTime,
+		JourneyReferenceId: referenceId,
 	}
 
 	jl.ApplyEvent(event, jl.applyEventFunction)
@@ -137,6 +145,7 @@ func (jl *JourneyLog) applyEventFunction(event kernel.DomainEvent) {
 		jl.isOnJourney = false
 	case JourneyStartedDomainEvent:
 		jl.isOnJourney = true
+		jl.journeyReferenceId = e.JourneyReferenceId
 		jl.startStation = e.StartStation
 		jl.startTime = e.StartTime
 		jl.endStation = ""
@@ -145,6 +154,7 @@ func (jl *JourneyLog) applyEventFunction(event kernel.DomainEvent) {
 		jl.fare = 0
 	case JourneyEndedDomainEvent:
 		jl.isOnJourney = false
+		jl.journeyReferenceId = ""
 		jl.endStation = e.EndStation
 		jl.endTime = e.EndTime
 		jl.distanceTravelled = e.DistanceTravelled

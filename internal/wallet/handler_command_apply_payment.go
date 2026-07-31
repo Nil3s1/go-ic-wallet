@@ -3,7 +3,7 @@ package wallet
 import (
 	"context"
 
-	"github.com/Nil3s1/go-ic-wallet/internal/modules/kernel"
+	"github.com/Nil3s1/go-ic-wallet/internal/kernel"
 )
 
 type ApplyPaymentCommandHandler struct {
@@ -23,7 +23,7 @@ func (h *ApplyPaymentCommandHandler) Handle(ctx context.Context, cmd ApplyPaymen
 		return err
 	}
 
-	err = card.ApplyPayment(cmd.Amount)
+	err = card.ApplyPayment(cmd.Amount, cmd.ReferenceId)
 
 	if err != nil {
 		return err

@@ -15,8 +15,9 @@ type JourneyLogCreatedDomainEvent struct {
 }
 
 type JourneyStartedDomainEvent struct {
-	StartStation string
-	StartTime    time.Time
+	StartStation       string
+	StartTime          time.Time
+	JourneyReferenceId string
 }
 
 type JourneyEndedDomainEvent struct {

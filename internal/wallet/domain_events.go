@@ -17,10 +17,12 @@ type CardCreatedDomainEvent struct {
 
 type BalanceAddedDomainEvent struct {
 	BalanceAdded int
+	ReferenceId  string
 }
 
 type ApplyPaymentDomainEvent struct {
-	Amount int
+	Amount      int
+	ReferenceId string
 }
 
 func (e CardCreatedDomainEvent) EventName() string {

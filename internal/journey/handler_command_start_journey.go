@@ -4,23 +4,23 @@ import (
 	"context"
 	"errors"
 
-	"github.com/Nil3s1/go-ic-wallet/internal/modules/kernel"
+	"github.com/Nil3s1/go-ic-wallet/internal/kernel"
 )
 
 type StartJourneyCommandHandler struct {
-	store    kernel.EventStore[*JourneyLog]
-	provider CardProvider
+	store       kernel.EventStore[*JourneyLog]
+	paymentPort PaymentPort
 }
 
-func NewStartJourneyCommandHandler(provider CardProvider, store kernel.EventStore[*JourneyLog]) *StartJourneyCommandHandler {
+func NewStartJourneyCommandHandler(paymentPort PaymentPort, store kernel.EventStore[*JourneyLog]) *StartJourneyCommandHandler {
 	return &StartJourneyCommandHandler{
-		store:    store,
-		provider: provider,
+		store:       store,
+		paymentPort: paymentPort,
 	}
 }
 
 func (h *StartJourneyCommandHandler) Handle(ctx context.Context, cmd StartJourneyCommand) error {
-	result, err := CardHasSufficientBalance(h.provider, cmd.CardNo, BaseFare)
+	result, err := h.paymentPort.HasSufficientBalance(cmd.CardNo, BaseFare)
 
 	if err != nil {
 		return err
