@@ -9,9 +9,8 @@ const (
 )
 
 type JourneyLogCreatedDomainEvent struct {
-	PredecessorCardNo string
-	CardNo            string
-	CreatedAt         time.Time
+	MediaId   string
+	CreatedAt time.Time
 }
 
 type JourneyStartedDomainEvent struct {

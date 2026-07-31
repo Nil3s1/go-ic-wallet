@@ -20,7 +20,7 @@ func NewStartJourneyCommandHandler(paymentPort PaymentPort, store kernel.EventSt
 }
 
 func (h *StartJourneyCommandHandler) Handle(ctx context.Context, cmd StartJourneyCommand) error {
-	result, err := h.paymentPort.HasSufficientBalance(cmd.CardNo, BaseFare)
+	result, err := h.paymentPort.HasSufficientBalance(cmd.MediaId, BaseFare)
 
 	if err != nil {
 		return err
@@ -30,7 +30,19 @@ func (h *StartJourneyCommandHandler) Handle(ctx context.Context, cmd StartJourne
 		return errors.New("Insufficient Balance to Start the Journey")
 	}
 
-	jl, err := h.store.Load(ctx, cmd.CardNo)
+	exists, err := h.store.Exists(ctx, cmd.MediaId)
+
+	if err != nil {
+		return err
+	}
+
+	var jl *JourneyLog
+
+	if exists {
+		jl, err = h.store.Load(ctx, cmd.MediaId)
+	} else {
+		jl, err = NewJourneyLog(cmd.MediaId)
+	}
 
 	if err != nil {
 		return err

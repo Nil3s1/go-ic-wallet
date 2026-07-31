@@ -21,7 +21,7 @@ func NewEndJourneyCommandHandler(paymentPort PaymentPort, store kernel.EventStor
 }
 
 func (h *EndJourneyCommandHandler) Handle(ctx context.Context, cmd EndJourneyCommand) error {
-	jl, err := h.store.Load(ctx, cmd.CardNo)
+	jl, err := h.store.Load(ctx, cmd.MediaId)
 	if err != nil {
 		return err
 	}
@@ -31,7 +31,7 @@ func (h *EndJourneyCommandHandler) Handle(ctx context.Context, cmd EndJourneyCom
 		return err
 	}
 
-	err = h.paymentPort.AuthorizePayment(cmd.CardNo, jl.JourneyReferenceId(), cf.Fare())
+	err = h.paymentPort.AuthorizePayment(cmd.MediaId, jl.JourneyReferenceId(), cf.Fare())
 	if err != nil {
 		return err
 	}

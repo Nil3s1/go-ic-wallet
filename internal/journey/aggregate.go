@@ -11,7 +11,7 @@ import (
 type JourneyLog struct {
 	kernel.BaseAggregate
 
-	predecessorCardNo  string
+	mediaId            string
 	isOnJourney        bool
 	journeyReferenceId string
 	startStation       string
@@ -22,21 +22,16 @@ type JourneyLog struct {
 	fare               int
 }
 
-func NewJourneyLog(cardNo string) (*JourneyLog, error) {
-	return NewJourneyLogWithPredecessor(cardNo, "")
-}
-
-func NewJourneyLogWithPredecessor(cardNo string, predecessorCardNo string) (*JourneyLog, error) {
-	if cardNo == "" {
-		return nil, errors.New("cannot create journey log: cardNo is empty")
+func NewJourneyLog(mediaId string) (*JourneyLog, error) {
+	if mediaId == "" {
+		return nil, errors.New("cannot create journey log: mediaId is empty")
 	}
 
 	createdAt := time.Now().UTC()
 
 	event := JourneyLogCreatedDomainEvent{
-		CardNo:            cardNo,
-		CreatedAt:         createdAt,
-		PredecessorCardNo: predecessorCardNo,
+		MediaId:   mediaId,
+		CreatedAt: createdAt,
 	}
 
 	jl := &JourneyLog{}
@@ -52,12 +47,8 @@ func Rehydrate(events []kernel.DomainEvent) *JourneyLog {
 	return jl
 }
 
-func (jl *JourneyLog) PredecessorCardNo() string {
-	return jl.predecessorCardNo
-}
-
-func (jl *JourneyLog) CardNo() string {
-	return jl.Id()
+func (jl *JourneyLog) MediaId() string {
+	return jl.mediaId
 }
 
 func (jl *JourneyLog) IsOnJourney() bool {
@@ -139,9 +130,9 @@ func (jl *JourneyLog) EndJourney(endStation string, cf CalculatedFare) error {
 func (jl *JourneyLog) applyEventFunction(event kernel.DomainEvent) {
 	switch e := event.(type) {
 	case JourneyLogCreatedDomainEvent:
-		jl.SetId(e.CardNo)
+		jl.SetId(e.MediaId)
 		jl.SetCreatedAt(e.CreatedAt)
-		jl.predecessorCardNo = e.PredecessorCardNo
+		jl.mediaId = e.MediaId
 		jl.isOnJourney = false
 	case JourneyStartedDomainEvent:
 		jl.isOnJourney = true
