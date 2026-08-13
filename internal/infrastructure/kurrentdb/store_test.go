@@ -11,12 +11,12 @@ import (
 )
 
 type fakeStreamClient struct {
-	streams         map[string][]kurrentdb.EventData
+	streams         map[string][]kurrentdb.RecordedEvent
 	appendRevisions []kurrentdb.StreamState
 }
 
 func newFakeStreamClient() *fakeStreamClient {
-	return &fakeStreamClient{streams: make(map[string][]kurrentdb.EventData)}
+	return &fakeStreamClient{streams: make(map[string][]kurrentdb.RecordedEvent)}
 }
 
 func (c *fakeStreamClient) AppendToStream(
@@ -26,7 +26,12 @@ func (c *fakeStreamClient) AppendToStream(
 	events ...kurrentdb.EventData,
 ) (*kurrentdb.WriteResult, error) {
 	c.appendRevisions = append(c.appendRevisions, opts.StreamState)
-	c.streams[streamID] = append(c.streams[streamID], events...)
+	for _, event := range events {
+		c.streams[streamID] = append(c.streams[streamID], kurrentdb.RecordedEvent{
+			EventType: event.EventType,
+			Data:      event.Data,
+		})
+	}
 
 	return &kurrentdb.WriteResult{}, nil
 }
@@ -41,7 +46,7 @@ func (c *fakeStreamClient) ReadStream(
 }
 
 type fakeReadStream struct {
-	events []kurrentdb.EventData
+	events []kurrentdb.RecordedEvent
 	index  int
 }
 
@@ -54,10 +59,7 @@ func (s *fakeReadStream) Recv() (*kurrentdb.ResolvedEvent, error) {
 	s.index++
 
 	return &kurrentdb.ResolvedEvent{
-		Event: &kurrentdb.RecordedEvent{
-			EventType: event.EventType,
-			Data:      event.Data,
-		},
+		Event: &event,
 	}, nil
 }
 
