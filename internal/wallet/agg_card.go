@@ -41,7 +41,7 @@ func NewCard(initialBalance int) (*Card, error) {
 	}
 
 	card := &Card{processedReferenceIds: make(map[string]bool)}
-	card.applyEventFunction(event)
+	card.ApplyEvent(event, card.applyEventFunction)
 
 	return card, nil
 }

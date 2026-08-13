@@ -31,5 +31,5 @@ func (h *ApplyPaymentCommandHandler) Handle(ctx context.Context, cmd ApplyPaymen
 
 	err = h.store.Save(ctx, card)
 
-	return nil
+	return err
 }
