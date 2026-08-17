@@ -17,6 +17,18 @@ type endJourneyRequest struct {
 	EndStation string `json:"endStation"`
 }
 
+type startJourneyResponse struct {
+	MediaId     string `json:"mediaId"`
+	IsOnJourney bool   `json:"isOnJourney"`
+}
+
+type endJourneyResponse struct {
+	MediaId           string `json:"mediaId"`
+	IsOnJourney       bool   `json:"isOnJourney"`
+	DistanceTravelled uint   `json:"distanceTravelled"`
+	Fare              uint   `json:"fare"`
+}
+
 func startJourneyHandler(h *journeyapplication.StartJourneyCommandHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req startJourneyRequest
@@ -30,12 +42,16 @@ func startJourneyHandler(h *journeyapplication.StartJourneyCommandHandler) http.
 			StartStation: req.StartStation,
 		}
 
-		if err := h.Handle(r.Context(), cmd); err != nil {
+		res, err := h.Handle(r.Context(), cmd)
+		if err != nil {
 			writeError(w, http.StatusBadRequest, err)
 			return
 		}
 
-		w.WriteHeader(http.StatusNoContent)
+		writeJSON(w, http.StatusOK, startJourneyResponse{
+			MediaId:     res.MediaId,
+			IsOnJourney: res.IsOnJourney,
+		})
 	}
 }
 
@@ -52,11 +68,17 @@ func endJourneyHandler(h *journeyapplication.EndJourneyCommandHandler) http.Hand
 			EndStation: req.EndStation,
 		}
 
-		if err := h.Handle(r.Context(), cmd); err != nil {
+		res, err := h.Handle(r.Context(), cmd)
+		if err != nil {
 			writeError(w, http.StatusBadRequest, err)
 			return
 		}
 
-		w.WriteHeader(http.StatusNoContent)
+		writeJSON(w, http.StatusOK, endJourneyResponse{
+			MediaId:           res.MediaId,
+			IsOnJourney:       res.IsOnJourney,
+			DistanceTravelled: res.DistanceTravelled,
+			Fare:              res.Fare,
+		})
 	}
 }

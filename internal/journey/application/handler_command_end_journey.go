@@ -21,29 +21,34 @@ func NewEndJourneyCommandHandler(paymentPort domain.PaymentPort, store applicati
 	}
 }
 
-func (h *EndJourneyCommandHandler) Handle(ctx context.Context, cmd EndJourneyCommand) error {
+func (h *EndJourneyCommandHandler) Handle(ctx context.Context, cmd EndJourneyCommand) (EndJourneyResult, error) {
 	jl, err := h.store.Load(ctx, cmd.MediaId)
 	if err != nil {
-		return err
+		return EndJourneyResult{}, err
 	}
 
 	cf, err := h.calculator.CalculateFare(jl.StartStation(), cmd.EndStation)
 	if err != nil {
-		return err
+		return EndJourneyResult{}, err
 	}
 
 	err = h.paymentPort.AuthorizePayment(ctx, cmd.MediaId, jl.JourneyReferenceId(), cf.Fare())
 	if err != nil {
-		return err
+		return EndJourneyResult{}, err
 	}
 
 	err = jl.EndJourney(cmd.EndStation, cf)
 
 	if err != nil {
-		return err
+		return EndJourneyResult{}, err
 	}
 
 	err = h.store.Save(ctx, jl)
 
-	return err
+	return EndJourneyResult{
+		MediaId:           cmd.MediaId,
+		IsOnJourney:       jl.IsOnJourney(),
+		DistanceTravelled: jl.DistanceTravelled(),
+		Fare:              jl.Fare(),
+	}, err
 }

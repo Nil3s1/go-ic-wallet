@@ -20,21 +20,21 @@ func NewStartJourneyCommandHandler(paymentPort domain.PaymentPort, store kernelA
 	}
 }
 
-func (h *StartJourneyCommandHandler) Handle(ctx context.Context, cmd StartJourneyCommand) error {
+func (h *StartJourneyCommandHandler) Handle(ctx context.Context, cmd StartJourneyCommand) (StartJourneyResult, error) {
 	result, err := h.paymentPort.HasSufficientBalance(ctx, cmd.MediaId, domain.BaseFare)
 
 	if err != nil {
-		return err
+		return StartJourneyResult{}, err
 	}
 
 	if result == false {
-		return errors.New("Insufficient Balance to Start the Journey")
+		return StartJourneyResult{}, errors.New("Insufficient Balance to Start the Journey")
 	}
 
 	exists, err := h.store.Exists(ctx, cmd.MediaId)
 
 	if err != nil {
-		return err
+		return StartJourneyResult{}, err
 	}
 
 	var jl *domain.JourneyLog
@@ -46,16 +46,19 @@ func (h *StartJourneyCommandHandler) Handle(ctx context.Context, cmd StartJourne
 	}
 
 	if err != nil {
-		return err
+		return StartJourneyResult{}, err
 	}
 
 	err = jl.StartJourney(cmd.StartStation)
 
 	if err != nil {
-		return err
+		return StartJourneyResult{}, err
 	}
 
 	err = h.store.Save(ctx, jl)
 
-	return err
+	return StartJourneyResult{
+		MediaId:     cmd.MediaId,
+		IsOnJourney: jl.IsOnJourney(),
+	}, err
 }
