@@ -8,8 +8,7 @@ import (
 )
 
 type createCardRequest struct {
-	CardNo         string `json:"cardNo"`
-	InitialBalance uint   `json:"initialBalance"`
+	InitialBalance uint `json:"initialBalance"`
 }
 
 type addBalanceRequest struct {
@@ -21,6 +20,17 @@ type applyPaymentRequest struct {
 	ReferenceId string `json:"referenceId"`
 }
 
+type createCardResponse struct {
+	CardNo  string `json:"cardNo"`
+	ValidTo string `json:"validTo"`
+}
+
+type balanceResponse struct {
+	CardNo     string `json:"cardNo"`
+	OldBalance uint   `json:"oldBalance"`
+	NewBalance uint   `json:"newBalance"`
+}
+
 func createCardHandler(h *walletapplication.CreateCardCommandHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req createCardRequest
@@ -30,16 +40,19 @@ func createCardHandler(h *walletapplication.CreateCardCommandHandler) http.Handl
 		}
 
 		cmd := walletapplication.CreateCardCommand{
-			CardNo:         req.CardNo,
 			InitialBalance: req.InitialBalance,
 		}
+		result, err := h.Handle(r.Context(), cmd)
 
-		if err := h.Handle(r.Context(), cmd); err != nil {
+		if err != nil {
 			writeError(w, http.StatusBadRequest, err)
 			return
 		}
 
-		w.WriteHeader(http.StatusCreated)
+		writeJSON(w, http.StatusCreated, createCardResponse{
+			CardNo:  result.CardNo,
+			ValidTo: result.ValidTo.Format("2006-01-02"),
+		})
 	}
 }
 
@@ -56,12 +69,17 @@ func addBalanceHandler(h *walletapplication.AddBalanceCommandHandler) http.Handl
 			Amount: req.Amount,
 		}
 
-		if err := h.Handle(r.Context(), cmd); err != nil {
+		result, err := h.Handle(r.Context(), cmd)
+		if err != nil {
 			writeError(w, http.StatusBadRequest, err)
 			return
 		}
 
-		w.WriteHeader(http.StatusNoContent)
+		writeJSON(w, http.StatusOK, balanceResponse{
+			CardNo:     result.CardNo,
+			OldBalance: result.OldBalance,
+			NewBalance: result.NewBalance,
+		})
 	}
 }
 
@@ -79,11 +97,16 @@ func applyPaymentHandler(h *walletapplication.ApplyPaymentCommandHandler) http.H
 			ReferenceId: req.ReferenceId,
 		}
 
-		if err := h.Handle(r.Context(), cmd); err != nil {
+		result, err := h.Handle(r.Context(), cmd)
+		if err != nil {
 			writeError(w, http.StatusBadRequest, err)
 			return
 		}
 
-		w.WriteHeader(http.StatusNoContent)
+		writeJSON(w, http.StatusOK, balanceResponse{
+			CardNo:     result.CardNo,
+			OldBalance: result.OldBalance,
+			NewBalance: result.NewBalance,
+		})
 	}
 }

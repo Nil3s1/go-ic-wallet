@@ -39,8 +39,9 @@ func (p *PaymentAdapter) HasSufficientBalance(ctx context.Context, cardNo string
 func (p *PaymentAdapter) AuthorizePayment(ctx context.Context, cardNo string, referenceId string, amount uint) error {
 	command := application.ApplyPaymentCommand{
 		CardNo:      cardNo,
-		Amount:      uint(amount),
+		Amount:      amount,
 		ReferenceId: referenceId,
 	}
-	return p.applyPaymentHandler.Handle(ctx, command)
+	_, err := p.applyPaymentHandler.Handle(ctx, command)
+	return err
 }

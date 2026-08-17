@@ -18,8 +18,8 @@ type JourneyLog struct {
 	startTime          time.Time
 	endStation         string
 	endTime            time.Time
-	distanceTravelled  int
-	fare               int
+	distanceTravelled  uint
+	fare               uint
 }
 
 func NewJourneyLog(mediaId string) (*JourneyLog, error) {
@@ -75,11 +75,11 @@ func (jl *JourneyLog) EndTime() time.Time {
 	return jl.endTime
 }
 
-func (jl *JourneyLog) DistanceTravelled() int {
+func (jl *JourneyLog) DistanceTravelled() uint {
 	return jl.distanceTravelled
 }
 
-func (jl *JourneyLog) Fare() int {
+func (jl *JourneyLog) Fare() uint {
 	return jl.fare
 }
 
@@ -111,9 +111,6 @@ func (jl *JourneyLog) EndJourney(endStation string, cf CalculatedFare) error {
 	}
 	if !jl.isOnJourney {
 		return errors.New("cannot end journey: no journey started for this card")
-	}
-	if cf.Distance() < 0 || cf.Fare() < 0 {
-		return errors.New("distance and fare must be positive")
 	}
 
 	event := JourneyEndedDomainEvent{

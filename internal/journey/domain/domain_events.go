@@ -22,8 +22,8 @@ type JourneyStartedDomainEvent struct {
 type JourneyEndedDomainEvent struct {
 	EndStation        string
 	EndTime           time.Time
-	DistanceTravelled int
-	Fare              int
+	DistanceTravelled uint
+	Fare              uint
 }
 
 func (e JourneyLogCreatedDomainEvent) EventName() string {

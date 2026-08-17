@@ -17,18 +17,21 @@ func NewCreateCardHandler(store kernelApplication.EventStore[*domain.Card]) *Cre
 	}
 }
 
-func (h *CreateCardCommandHandler) Handle(ctx context.Context, cmd CreateCardCommand) error {
+func (h *CreateCardCommandHandler) Handle(ctx context.Context, cmd CreateCardCommand) (CreateCardResult, error) {
 	card, err := domain.NewCard(cmd.InitialBalance)
 
 	if err != nil {
-		return err
+		return CreateCardResult{}, err
 	}
 
 	err = h.store.Save(ctx, card)
 
 	if err != nil {
-		return err
+		return CreateCardResult{}, err
 	}
 
-	return err
+	return CreateCardResult{
+		CardNo:  card.CardNo(),
+		ValidTo: card.ValidTo(),
+	}, nil
 }

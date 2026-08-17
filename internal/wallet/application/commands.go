@@ -1,7 +1,6 @@
 package application
 
 type CreateCardCommand struct {
-	CardNo         string
 	InitialBalance uint
 }
 

@@ -17,20 +17,28 @@ func NewAddBalanceHandler(store kernelApplication.EventStore[*domain.Card]) *Add
 	}
 }
 
-func (h *AddBalanceCommandHandler) Handle(ctx context.Context, cmd AddBalanceCommand) error {
+func (h *AddBalanceCommandHandler) Handle(ctx context.Context, cmd AddBalanceCommand) (BalanceResult, error) {
+	var result BalanceResult
 	card, err := h.store.Load(ctx, cmd.CardNo)
 
 	if err != nil {
-		return err
+		return result, err
 	}
+
+	oldBalance := card.CurrentBalance()
 
 	err = card.AddBalance(cmd.Amount)
 
 	if err != nil {
-		return err
+		return result, err
 	}
 
 	err = h.store.Save(ctx, card)
 
-	return err
+	result = BalanceResult{
+		CardNo:     card.CardNo(),
+		OldBalance: oldBalance,
+		NewBalance: card.CurrentBalance(),
+	}
+	return result, err
 }

@@ -3,12 +3,12 @@ package domain
 const BaseFare = 200
 
 type CalculatedFare struct {
-	fare     int
-	distance int
+	fare     uint
+	distance uint
 }
 
-func (v CalculatedFare) Fare() int     { return v.fare }
-func (v CalculatedFare) Distance() int { return v.distance }
+func (v CalculatedFare) Fare() uint     { return v.fare }
+func (v CalculatedFare) Distance() uint { return v.distance }
 
 type FareCalculator struct {
 	provider StationProvider
@@ -21,8 +21,8 @@ func NewFareCalculator(provider StationProvider) *FareCalculator {
 }
 
 func (fc *FareCalculator) CalculateFare(start string, end string) (cf CalculatedFare, err error) {
-	farePerDistance := 10
-	fare := 0
+	farePerDistance := uint(10)
+	fare := uint(0)
 	startInfo, err := fc.provider.GetStationInfo(start)
 	if err != nil {
 		return CalculatedFare{}, err
@@ -39,11 +39,11 @@ func (fc *FareCalculator) CalculateFare(start string, end string) (cf Calculated
 		distance = -distance
 	}
 
-	fare = BaseFare + (farePerDistance * distance)
+	fare = BaseFare + (farePerDistance * uint(distance))
 
 	calculatedFare := CalculatedFare{
 		fare:     fare,
-		distance: distance,
+		distance: uint(distance),
 	}
 
 	return calculatedFare, nil

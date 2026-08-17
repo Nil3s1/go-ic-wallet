@@ -17,20 +17,25 @@ func NewApplyPaymentCommandHandler(store kernelApplication.EventStore[*domain.Ca
 	}
 }
 
-func (h *ApplyPaymentCommandHandler) Handle(ctx context.Context, cmd ApplyPaymentCommand) error {
+func (h *ApplyPaymentCommandHandler) Handle(ctx context.Context, cmd ApplyPaymentCommand) (BalanceResult, error) {
 	card, err := h.store.Load(ctx, cmd.CardNo)
 
 	if err != nil {
-		return err
+		return BalanceResult{}, err
 	}
 
+	oldBalance := card.CurrentBalance()
 	err = card.ApplyPayment(cmd.Amount, cmd.ReferenceId)
 
 	if err != nil {
-		return err
+		return BalanceResult{}, err
 	}
 
 	err = h.store.Save(ctx, card)
 
-	return nil
+	return BalanceResult{
+		CardNo:     card.CardNo(),
+		OldBalance: oldBalance,
+		NewBalance: card.CurrentBalance(),
+	}, err
 }
