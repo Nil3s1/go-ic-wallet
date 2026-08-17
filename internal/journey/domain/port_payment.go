@@ -1,4 +1,4 @@
-package journey
+package domain
 
 type PaymentPort interface {
 	HasSufficientBalance(mediaId string, amount int) (bool, error)

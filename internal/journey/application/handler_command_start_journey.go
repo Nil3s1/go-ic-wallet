@@ -1,18 +1,19 @@
-package journey
+package application
 
 import (
 	"context"
 	"errors"
 
+	"github.com/Nil3s1/go-ic-wallet/internal/journey/domain"
 	"github.com/Nil3s1/go-ic-wallet/internal/kernel"
 )
 
 type StartJourneyCommandHandler struct {
-	store       kernel.EventStore[*JourneyLog]
-	paymentPort PaymentPort
+	store       kernel.EventStore[*domain.JourneyLog]
+	paymentPort domain.PaymentPort
 }
 
-func NewStartJourneyCommandHandler(paymentPort PaymentPort, store kernel.EventStore[*JourneyLog]) *StartJourneyCommandHandler {
+func NewStartJourneyCommandHandler(paymentPort domain.PaymentPort, store kernel.EventStore[*domain.JourneyLog]) *StartJourneyCommandHandler {
 	return &StartJourneyCommandHandler{
 		store:       store,
 		paymentPort: paymentPort,
@@ -20,7 +21,7 @@ func NewStartJourneyCommandHandler(paymentPort PaymentPort, store kernel.EventSt
 }
 
 func (h *StartJourneyCommandHandler) Handle(ctx context.Context, cmd StartJourneyCommand) error {
-	result, err := h.paymentPort.HasSufficientBalance(cmd.MediaId, BaseFare)
+	result, err := h.paymentPort.HasSufficientBalance(cmd.MediaId, domain.BaseFare)
 
 	if err != nil {
 		return err
@@ -36,12 +37,12 @@ func (h *StartJourneyCommandHandler) Handle(ctx context.Context, cmd StartJourne
 		return err
 	}
 
-	var jl *JourneyLog
+	var jl *domain.JourneyLog
 
 	if exists {
 		jl, err = h.store.Load(ctx, cmd.MediaId)
 	} else {
-		jl, err = NewJourneyLog(cmd.MediaId)
+		jl, err = domain.NewJourneyLog(cmd.MediaId)
 	}
 
 	if err != nil {

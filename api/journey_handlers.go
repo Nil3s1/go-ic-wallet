@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/Nil3s1/go-ic-wallet/internal/journey"
+	journeyapplication "github.com/Nil3s1/go-ic-wallet/internal/journey/application"
 )
 
 type startJourneyRequest struct {
@@ -17,7 +17,7 @@ type endJourneyRequest struct {
 	EndStation string `json:"endStation"`
 }
 
-func startJourneyHandler(h *journey.StartJourneyCommandHandler) http.HandlerFunc {
+func startJourneyHandler(h *journeyapplication.StartJourneyCommandHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req startJourneyRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -25,7 +25,7 @@ func startJourneyHandler(h *journey.StartJourneyCommandHandler) http.HandlerFunc
 			return
 		}
 
-		cmd := journey.StartJourneyCommand{
+		cmd := journeyapplication.StartJourneyCommand{
 			MediaId:      req.MediaId,
 			StartStation: req.StartStation,
 		}
@@ -39,7 +39,7 @@ func startJourneyHandler(h *journey.StartJourneyCommandHandler) http.HandlerFunc
 	}
 }
 
-func endJourneyHandler(h *journey.EndJourneyCommandHandler) http.HandlerFunc {
+func endJourneyHandler(h *journeyapplication.EndJourneyCommandHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req endJourneyRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -47,7 +47,7 @@ func endJourneyHandler(h *journey.EndJourneyCommandHandler) http.HandlerFunc {
 			return
 		}
 
-		cmd := journey.EndJourneyCommand{
+		cmd := journeyapplication.EndJourneyCommand{
 			MediaId:    req.MediaId,
 			EndStation: req.EndStation,
 		}

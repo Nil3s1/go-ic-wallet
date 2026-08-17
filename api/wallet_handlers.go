@@ -3,9 +3,9 @@ package api
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
+	
 
-	"github.com/Nil3s1/go-ic-wallet/internal/wallet"
+	walletapplication "github.com/Nil3s1/go-ic-wallet/internal/wallet/application"
 )
 
 type createCardRequest struct {
@@ -22,13 +22,7 @@ type applyPaymentRequest struct {
 	ReferenceId string `json:"referenceId"`
 }
 
-type sufficientBalanceResponse struct {
-	CardNo            string `json:"cardNo"`
-	Amount            int    `json:"amount"`
-	SufficientBalance bool   `json:"sufficientBalance"`
-}
-
-func createCardHandler(h *wallet.CreateCardCommandHandler) http.HandlerFunc {
+func createCardHandler(h *walletapplication.CreateCardCommandHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req createCardRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -36,7 +30,7 @@ func createCardHandler(h *wallet.CreateCardCommandHandler) http.HandlerFunc {
 			return
 		}
 
-		cmd := wallet.CreateCardCommand{
+		cmd := walletapplication.CreateCardCommand{
 			CardNo:         req.CardNo,
 			InitialBalance: req.InitialBalance,
 		}
@@ -50,7 +44,7 @@ func createCardHandler(h *wallet.CreateCardCommandHandler) http.HandlerFunc {
 	}
 }
 
-func addBalanceHandler(h *wallet.AddBalanceCommandHandler) http.HandlerFunc {
+func addBalanceHandler(h *walletapplication.AddBalanceCommandHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req addBalanceRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -58,7 +52,7 @@ func addBalanceHandler(h *wallet.AddBalanceCommandHandler) http.HandlerFunc {
 			return
 		}
 
-		cmd := wallet.AddBalanceCommand{
+		cmd := walletapplication.AddBalanceCommand{
 			CardNo: r.PathValue("cardNo"),
 			Amount: req.Amount,
 		}
@@ -72,7 +66,7 @@ func addBalanceHandler(h *wallet.AddBalanceCommandHandler) http.HandlerFunc {
 	}
 }
 
-func applyPaymentHandler(h *wallet.ApplyPaymentCommandHandler) http.HandlerFunc {
+func applyPaymentHandler(h *walletapplication.ApplyPaymentCommandHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req applyPaymentRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -80,7 +74,7 @@ func applyPaymentHandler(h *wallet.ApplyPaymentCommandHandler) http.HandlerFunc 
 			return
 		}
 
-		cmd := wallet.ApplyPaymentCommand{
+		cmd := walletapplication.ApplyPaymentCommand{
 			CardNo:      r.PathValue("cardNo"),
 			Amount:      req.Amount,
 			ReferenceId: req.ReferenceId,
@@ -92,32 +86,5 @@ func applyPaymentHandler(h *wallet.ApplyPaymentCommandHandler) http.HandlerFunc 
 		}
 
 		w.WriteHeader(http.StatusNoContent)
-	}
-}
-
-func hasSufficientBalanceHandler(h *wallet.HasSufficientBalanceQueryHandler) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		cardNo := r.PathValue("cardNo")
-
-		amount, err := strconv.Atoi(r.URL.Query().Get("amount"))
-		if err != nil {
-			writeError(w, http.StatusBadRequest, err)
-			return
-		}
-
-		sufficient, err := h.Handle(wallet.HasSufficientBalanceQuery{
-			CardNo: cardNo,
-			Amount: amount,
-		})
-		if err != nil {
-			writeError(w, http.StatusBadRequest, err)
-			return
-		}
-
-		writeJSON(w, http.StatusOK, sufficientBalanceResponse{
-			CardNo:            cardNo,
-			Amount:            amount,
-			SufficientBalance: sufficient,
-		})
 	}
 }

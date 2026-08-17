@@ -3,17 +3,17 @@ package api
 import (
 	"net/http"
 
-	"github.com/Nil3s1/go-ic-wallet/internal/journey"
-	"github.com/Nil3s1/go-ic-wallet/internal/wallet"
+	journeyapplication "github.com/Nil3s1/go-ic-wallet/internal/journey/application"
+	walletapplication "github.com/Nil3s1/go-ic-wallet/internal/wallet/application"
 )
 
 type Dependencies struct {
-	CreateCard           *wallet.CreateCardCommandHandler
-	AddBalance           *wallet.AddBalanceCommandHandler
-	ApplyPayment         *wallet.ApplyPaymentCommandHandler
-	HasSufficientBalance *wallet.HasSufficientBalanceQueryHandler
-	StartJourney         *journey.StartJourneyCommandHandler
-	EndJourney           *journey.EndJourneyCommandHandler
+	CreateCard           *walletapplication.CreateCardCommandHandler
+	AddBalance           *walletapplication.AddBalanceCommandHandler
+	ApplyPayment         *walletapplication.ApplyPaymentCommandHandler
+	HasSufficientBalance *walletapplication.HasSufficientBalanceQueryHandler
+	StartJourney         *journeyapplication.StartJourneyCommandHandler
+	EndJourney           *journeyapplication.EndJourneyCommandHandler
 }
 
 func NewRouter(deps Dependencies) *http.ServeMux {

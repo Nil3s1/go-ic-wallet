@@ -1,4 +1,4 @@
-package wallet
+package domain
 
 type CardProjectionRepository interface {
 	GetCard(cardNo string) (CardProjection, error)

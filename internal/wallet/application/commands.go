@@ -1,4 +1,4 @@
-package wallet
+package application
 
 type CreateCardCommand struct {
 	CardNo         string

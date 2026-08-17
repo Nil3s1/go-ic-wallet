@@ -1,18 +1,19 @@
-package journey
+package application
 
 import (
 	"context"
 
+	"github.com/Nil3s1/go-ic-wallet/internal/journey/domain"
 	"github.com/Nil3s1/go-ic-wallet/internal/kernel"
 )
 
 type EndJourneyCommandHandler struct {
-	store       kernel.EventStore[*JourneyLog]
-	paymentPort PaymentPort
-	calculator  FareCalculator
+	store       kernel.EventStore[*domain.JourneyLog]
+	paymentPort domain.PaymentPort
+	calculator  domain.FareCalculator
 }
 
-func NewEndJourneyCommandHandler(paymentPort PaymentPort, store kernel.EventStore[*JourneyLog], calculator FareCalculator) *EndJourneyCommandHandler {
+func NewEndJourneyCommandHandler(paymentPort domain.PaymentPort, store kernel.EventStore[*domain.JourneyLog], calculator domain.FareCalculator) *EndJourneyCommandHandler {
 	return &EndJourneyCommandHandler{
 		store:       store,
 		paymentPort: paymentPort,

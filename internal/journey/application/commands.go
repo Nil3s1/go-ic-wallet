@@ -1,4 +1,4 @@
-package journey
+package application
 
 type StartJourneyCommand struct {
 	MediaId      string

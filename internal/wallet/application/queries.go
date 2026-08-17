@@ -1,4 +1,4 @@
-package wallet
+package application
 
 type HasSufficientBalanceQuery struct {
 	CardNo string

@@ -1,16 +1,17 @@
-package wallet
+package application
 
 import (
 	"context"
 
 	"github.com/Nil3s1/go-ic-wallet/internal/kernel"
+	"github.com/Nil3s1/go-ic-wallet/internal/wallet/domain"
 )
 
 type AddBalanceCommandHandler struct {
-	store kernel.EventStore[*Card]
+	store kernel.EventStore[*domain.Card]
 }
 
-func NewAddBalanceHandler(store kernel.EventStore[*Card]) *AddBalanceCommandHandler {
+func NewAddBalanceHandler(store kernel.EventStore[*domain.Card]) *AddBalanceCommandHandler {
 	return &AddBalanceCommandHandler{
 		store: store,
 	}

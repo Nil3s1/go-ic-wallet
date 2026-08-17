@@ -1,4 +1,4 @@
-package journey
+package domain
 
 const BaseFare = 200
 
