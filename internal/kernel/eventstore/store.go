@@ -110,6 +110,7 @@ func (s *Store[T]) Load(ctx context.Context, id string) (T, error) {
 }
 
 func (s *Store[T]) Save(ctx context.Context, aggregate T) error {
+	persistedVersion := aggregate.Version() - len(aggregate.UncommittedEvents())
 	uncommitted := aggregate.UncommittedEvents()
 	if len(uncommitted) == 0 {
 		return nil
@@ -130,12 +131,11 @@ func (s *Store[T]) Save(ctx context.Context, aggregate T) error {
 		}
 	}
 
-	// Version() only counts previously persisted events, so it doubles as the optimistic-concurrency check.
 	var expectedState kurrentdb.StreamState
-	if aggregate.Version() == 0 {
+	if persistedVersion == 0 {
 		expectedState = kurrentdb.NoStream{}
 	} else {
-		expectedState = kurrentdb.Revision(uint64(aggregate.Version() - 1))
+		expectedState = kurrentdb.Revision(uint64(persistedVersion - 1))
 	}
 
 	_, err := s.client.AppendToStream(ctx, s.streamName(aggregate.Id()), kurrentdb.AppendToStreamOptions{

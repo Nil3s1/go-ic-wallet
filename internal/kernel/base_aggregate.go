@@ -44,6 +44,7 @@ func (b *BaseAggregate) SetCreatedAt(value time.Time) {
 func (b *BaseAggregate) ApplyEvent(event DomainEvent, applyFunc func(DomainEvent)) {
 	applyFunc(event)
 	b.uncommittedEvents = append(b.uncommittedEvents, event)
+	b.IncrementVersion()
 }
 
 func (b *BaseAggregate) UncommittedEvents() []DomainEvent {
