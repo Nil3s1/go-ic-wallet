@@ -1,9 +1,11 @@
 package domain
 
-type CardProjectionRepository interface {
-	GetCard(cardNo string) (CardProjection, error)
-	HasSufficientBalance(cardNo string, amount int) (bool, error)
+import "context"
 
-	Update(card CardProjection) error
-	Add(card CardProjection) error
+type CardProjectionRepository interface {
+	GetCard(ctx context.Context, cardNo string) (CardProjection, error)
+	HasSufficientBalance(ctx context.Context, cardNo string, amount uint) (bool, error)
+
+	Update(ctx context.Context, card CardProjection) error
+	Add(ctx context.Context, card CardProjection) error
 }

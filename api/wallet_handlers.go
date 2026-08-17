@@ -3,22 +3,21 @@ package api
 import (
 	"encoding/json"
 	"net/http"
-	
 
 	walletapplication "github.com/Nil3s1/go-ic-wallet/internal/wallet/application"
 )
 
 type createCardRequest struct {
 	CardNo         string `json:"cardNo"`
-	InitialBalance int    `json:"initialBalance"`
+	InitialBalance uint   `json:"initialBalance"`
 }
 
 type addBalanceRequest struct {
-	Amount int `json:"amount"`
+	Amount uint `json:"amount"`
 }
 
 type applyPaymentRequest struct {
-	Amount      int    `json:"amount"`
+	Amount      uint   `json:"amount"`
 	ReferenceId string `json:"referenceId"`
 }
 

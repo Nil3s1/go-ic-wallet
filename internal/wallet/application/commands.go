@@ -2,16 +2,16 @@ package application
 
 type CreateCardCommand struct {
 	CardNo         string
-	InitialBalance int
+	InitialBalance uint
 }
 
 type AddBalanceCommand struct {
 	CardNo string
-	Amount int
+	Amount uint
 }
 
 type ApplyPaymentCommand struct {
 	CardNo      string
-	Amount      int
+	Amount      uint
 	ReferenceId string
 }

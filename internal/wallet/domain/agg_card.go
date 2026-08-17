@@ -15,15 +15,15 @@ type Card struct {
 
 	cardNo                string
 	validTo               time.Time
-	currentBalance        int //Currency in cents
+	currentBalance        uint //Currency in cents
 	processedReferenceIds map[string]bool
 }
 
-func hasSufficientBalance(currentBalance int, amount int) bool {
+func hasSufficientBalance(currentBalance uint, amount uint) bool {
 	return currentBalance >= amount
 }
 
-func NewCard(initialBalance int) (*Card, error) {
+func NewCard(initialBalance uint) (*Card, error) {
 	cardNo, err := generateCardNo()
 
 	if err != nil {
@@ -61,11 +61,11 @@ func (c *Card) ValidTo() time.Time {
 	return c.validTo
 }
 
-func (c *Card) CurrentBalance() int {
+func (c *Card) CurrentBalance() uint {
 	return c.currentBalance
 }
 
-func (c *Card) AddBalance(value int) error {
+func (c *Card) AddBalance(value uint) error {
 	if value <= 0 {
 		return errors.New("Betrag muss größer als 0 sein")
 	}
@@ -73,7 +73,7 @@ func (c *Card) AddBalance(value int) error {
 	generatedReferenceID := uuid.New().String()
 
 	event := BalanceAddedDomainEvent{
-		BalanceAdded: int(value),
+		BalanceAdded: value,
 		ReferenceId:  generatedReferenceID,
 	}
 
@@ -82,13 +82,25 @@ func (c *Card) AddBalance(value int) error {
 	return nil
 }
 
-func (c *Card) ApplyPayment(amount int, referenceID string) error {
+func (c *Card) ApplyPayment(amount uint, referenceID string) error {
+	if amount <= 0 {
+		return errors.New("Betrag muss größer als 0 sein")
+	}
+
+	if referenceID == "" {
+		return errors.New("ReferenceID darf nicht leer sein")
+	}
+
+	if c.processedReferenceIds[referenceID] {
+		return errors.New("Payment mit dieser ReferenceID wurde bereits verarbeitet")
+	}
+
 	if !hasSufficientBalance(c.currentBalance, amount) {
 		return errors.New("nicht genug Balance auf der Karte. Bitte Karte aufladen!")
 	}
 
 	event := ApplyPaymentDomainEvent{
-		Amount:      int(amount),
+		Amount:      amount,
 		ReferenceId: referenceID,
 	}
 

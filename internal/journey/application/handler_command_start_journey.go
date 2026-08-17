@@ -21,7 +21,7 @@ func NewStartJourneyCommandHandler(paymentPort domain.PaymentPort, store kernel.
 }
 
 func (h *StartJourneyCommandHandler) Handle(ctx context.Context, cmd StartJourneyCommand) error {
-	result, err := h.paymentPort.HasSufficientBalance(cmd.MediaId, domain.BaseFare)
+	result, err := h.paymentPort.HasSufficientBalance(ctx, cmd.MediaId, domain.BaseFare)
 
 	if err != nil {
 		return err

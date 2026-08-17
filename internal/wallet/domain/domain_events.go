@@ -10,18 +10,18 @@ const (
 
 type CardCreatedDomainEvent struct {
 	CardNo         string
-	InitialBalance int
+	InitialBalance uint
 	CreatedAt      time.Time
 	ValidTo        time.Time
 }
 
 type BalanceAddedDomainEvent struct {
-	BalanceAdded int
+	BalanceAdded uint
 	ReferenceId  string
 }
 
 type ApplyPaymentDomainEvent struct {
-	Amount      int
+	Amount      uint
 	ReferenceId string
 }
 

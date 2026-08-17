@@ -32,7 +32,7 @@ func (h *EndJourneyCommandHandler) Handle(ctx context.Context, cmd EndJourneyCom
 		return err
 	}
 
-	err = h.paymentPort.AuthorizePayment(cmd.MediaId, jl.JourneyReferenceId(), cf.Fare())
+	err = h.paymentPort.AuthorizePayment(ctx, cmd.MediaId, jl.JourneyReferenceId(), cf.Fare())
 	if err != nil {
 		return err
 	}
