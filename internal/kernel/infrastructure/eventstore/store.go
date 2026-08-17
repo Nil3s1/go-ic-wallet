@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/Nil3s1/go-ic-wallet/internal/kernel"
+	"github.com/Nil3s1/go-ic-wallet/internal/kernel/domain"
 	"github.com/google/uuid"
 	"github.com/kurrent-io/KurrentDB-Client-Go/kurrentdb"
 )
@@ -15,21 +15,21 @@ import (
 const readAllEventsCount = 10_000
 
 // EventDecoder unmarshals a stored event's raw payload into its concrete DomainEvent value.
-type EventDecoder func(data []byte) (kernel.DomainEvent, error)
+type EventDecoder func(data []byte) (domain.DomainEvent, error)
 
 // EventTypeRegistry maps a DomainEvent's EventName() to the decoder for its concrete type.
 type EventTypeRegistry map[string]EventDecoder
 
 // Store is a generic KurrentDB-backed kernel.EventStore[T] adapter, reused by every bounded context.
-type Store[T kernel.HasDomainEvents] struct {
+type Store[T domain.HasDomainEvents] struct {
 	client       *kurrentdb.Client
 	streamPrefix string
-	rehydrate    func([]kernel.DomainEvent) T
+	rehydrate    func([]domain.DomainEvent) T
 	eventTypes   EventTypeRegistry
 }
 
 // New builds a Store for T. rehydrate and eventTypes carry the bounded-context-specific knowledge.
-func New[T kernel.HasDomainEvents](client *kurrentdb.Client, streamPrefix string, rehydrate func([]kernel.DomainEvent) T, eventTypes EventTypeRegistry) *Store[T] {
+func New[T domain.HasDomainEvents](client *kurrentdb.Client, streamPrefix string, rehydrate func([]domain.DomainEvent) T, eventTypes EventTypeRegistry) *Store[T] {
 	return &Store[T]{
 		client:       client,
 		streamPrefix: streamPrefix,
@@ -78,7 +78,7 @@ func (s *Store[T]) Load(ctx context.Context, id string) (T, error) {
 	}
 	defer stream.Close()
 
-	var events []kernel.DomainEvent
+	var events []domain.DomainEvent
 	for {
 		resolved, err := stream.Recv()
 		if errors.Is(err, io.EOF) {

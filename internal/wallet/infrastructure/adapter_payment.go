@@ -3,21 +3,21 @@ package infrastructure
 import (
 	"context"
 
-	"github.com/Nil3s1/go-ic-wallet/internal/kernel"
+	kernelApplication "github.com/Nil3s1/go-ic-wallet/internal/kernel/application"
 	"github.com/Nil3s1/go-ic-wallet/internal/wallet/application"
 	"github.com/Nil3s1/go-ic-wallet/internal/wallet/domain"
 )
 
 type PaymentAdapter struct {
 	repo                        domain.CardProjectionRepository
-	store                       kernel.EventStore[*domain.Card]
+	store                       kernelApplication.EventStore[*domain.Card]
 	hasSufficientBalanceHandler *application.HasSufficientBalanceQueryHandler
 	applyPaymentHandler         *application.ApplyPaymentCommandHandler
 }
 
 func NewPaymentAdapter(
 	repo domain.CardProjectionRepository,
-	store kernel.EventStore[*domain.Card],
+	store kernelApplication.EventStore[*domain.Card],
 	hasSufficientBalanceHandler *application.HasSufficientBalanceQueryHandler,
 	applyPaymentHandler *application.ApplyPaymentCommandHandler) *PaymentAdapter {
 	return &PaymentAdapter{

@@ -3,15 +3,15 @@ package application
 import (
 	"context"
 
-	"github.com/Nil3s1/go-ic-wallet/internal/kernel"
+	kernelApplication "github.com/Nil3s1/go-ic-wallet/internal/kernel/application"
 	"github.com/Nil3s1/go-ic-wallet/internal/wallet/domain"
 )
 
 type ApplyPaymentCommandHandler struct {
-	store kernel.EventStore[*domain.Card]
+	store kernelApplication.EventStore[*domain.Card]
 }
 
-func NewApplyPaymentCommandHandler(store kernel.EventStore[*domain.Card]) *ApplyPaymentCommandHandler {
+func NewApplyPaymentCommandHandler(store kernelApplication.EventStore[*domain.Card]) *ApplyPaymentCommandHandler {
 	return &ApplyPaymentCommandHandler{
 		store: store,
 	}

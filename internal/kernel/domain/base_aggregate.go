@@ -1,4 +1,4 @@
-package kernel
+package domain
 
 import "time"
 

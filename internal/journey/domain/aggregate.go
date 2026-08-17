@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/Nil3s1/go-ic-wallet/internal/kernel"
+	kernel "github.com/Nil3s1/go-ic-wallet/internal/kernel/domain"
 	"github.com/google/uuid"
 )
 

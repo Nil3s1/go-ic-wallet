@@ -5,15 +5,15 @@ import (
 	"errors"
 
 	"github.com/Nil3s1/go-ic-wallet/internal/journey/domain"
-	"github.com/Nil3s1/go-ic-wallet/internal/kernel"
+	kernelApplication "github.com/Nil3s1/go-ic-wallet/internal/kernel/application"
 )
 
 type StartJourneyCommandHandler struct {
-	store       kernel.EventStore[*domain.JourneyLog]
+	store       kernelApplication.EventStore[*domain.JourneyLog]
 	paymentPort domain.PaymentPort
 }
 
-func NewStartJourneyCommandHandler(paymentPort domain.PaymentPort, store kernel.EventStore[*domain.JourneyLog]) *StartJourneyCommandHandler {
+func NewStartJourneyCommandHandler(paymentPort domain.PaymentPort, store kernelApplication.EventStore[*domain.JourneyLog]) *StartJourneyCommandHandler {
 	return &StartJourneyCommandHandler{
 		store:       store,
 		paymentPort: paymentPort,
