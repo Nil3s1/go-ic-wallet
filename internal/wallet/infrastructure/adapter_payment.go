@@ -9,14 +9,14 @@ import (
 )
 
 type PaymentAdapter struct {
-	repo                        domain.CardProjectionRepository
+	repo                        application.CardProjectionRepository
 	store                       kernelApplication.EventStore[*domain.Card]
 	hasSufficientBalanceHandler *application.HasSufficientBalanceQueryHandler
 	applyPaymentHandler         *application.ApplyPaymentCommandHandler
 }
 
 func NewPaymentAdapter(
-	repo domain.CardProjectionRepository,
+	repo application.CardProjectionRepository,
 	store kernelApplication.EventStore[*domain.Card],
 	hasSufficientBalanceHandler *application.HasSufficientBalanceQueryHandler,
 	applyPaymentHandler *application.ApplyPaymentCommandHandler) *PaymentAdapter {

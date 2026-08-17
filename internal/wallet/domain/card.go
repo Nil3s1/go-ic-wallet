@@ -19,7 +19,7 @@ type Card struct {
 	processedReferenceIds map[string]bool
 }
 
-func hasSufficientBalance(currentBalance uint, amount uint) bool {
+func HasSufficientBalance(currentBalance uint, amount uint) bool {
 	return currentBalance >= amount
 }
 
@@ -95,7 +95,7 @@ func (c *Card) ApplyPayment(amount uint, referenceID string) error {
 		return errors.New("Payment mit dieser ReferenceID wurde bereits verarbeitet")
 	}
 
-	if !hasSufficientBalance(c.currentBalance, amount) {
+	if !HasSufficientBalance(c.currentBalance, amount) {
 		return errors.New("nicht genug Balance auf der Karte. Bitte Karte aufladen!")
 	}
 

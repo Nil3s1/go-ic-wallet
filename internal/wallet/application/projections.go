@@ -1,6 +1,15 @@
-package domain
+package application
 
-import "context"
+import (
+	"context"
+	"time"
+)
+
+type CardProjection struct {
+	CardNo         string
+	ValidTo        time.Time
+	CurrentBalance uint //Currency in cents
+}
 
 type CardProjectionRepository interface {
 	GetCard(ctx context.Context, cardNo string) (CardProjection, error)

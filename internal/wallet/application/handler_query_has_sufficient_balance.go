@@ -2,15 +2,13 @@ package application
 
 import (
 	"context"
-
-	"github.com/Nil3s1/go-ic-wallet/internal/wallet/domain"
 )
 
 type HasSufficientBalanceQueryHandler struct {
-	repository domain.CardProjectionRepository
+	repository CardProjectionRepository
 }
 
-func NewHasSufficientBalanceQueryHandler(repository domain.CardProjectionRepository) *HasSufficientBalanceQueryHandler {
+func NewHasSufficientBalanceQueryHandler(repository CardProjectionRepository) *HasSufficientBalanceQueryHandler {
 	return &HasSufficientBalanceQueryHandler{
 		repository: repository,
 	}
