@@ -11,18 +11,18 @@ import (
 )
 
 var cardEventTypes = eventstore.EventTypeRegistry{
-	domain.EventCardCreated: func(data []byte) (kernel.DomainEvent, error) {
-		var e domain.CardCreatedDomainEvent
+	domain.EventCardCreatedV1: func(data []byte) (kernel.DomainEvent, error) {
+		var e domain.CardCreatedDomainEventV1
 		err := json.Unmarshal(data, &e)
 		return e, err
 	},
-	domain.EventBalanceAdded: func(data []byte) (kernel.DomainEvent, error) {
-		var e domain.BalanceAddedDomainEvent
+	domain.EventBalanceAddedV1: func(data []byte) (kernel.DomainEvent, error) {
+		var e domain.BalanceAddedDomainEventV1
 		err := json.Unmarshal(data, &e)
 		return e, err
 	},
-	domain.EventApplyPayment: func(data []byte) (kernel.DomainEvent, error) {
-		var e domain.ApplyPaymentDomainEvent
+	domain.EventApplyPaymentV1: func(data []byte) (kernel.DomainEvent, error) {
+		var e domain.ApplyPaymentDomainEventV1
 		err := json.Unmarshal(data, &e)
 		return e, err
 	},

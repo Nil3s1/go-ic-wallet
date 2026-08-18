@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/Nil3s1/go-ic-wallet/internal/kernel/domain"
 	"github.com/google/uuid"
@@ -40,6 +41,11 @@ func New[T domain.HasDomainEvents](client *kurrentdb.Client, streamPrefix string
 
 func (s *Store[T]) streamName(id string) string {
 	return s.streamPrefix + "-" + id
+}
+
+// AggregateID inverts streamName; false means the stream belongs to another store.
+func (s *Store[T]) AggregateID(streamName string) (string, bool) {
+	return strings.CutPrefix(streamName, s.streamPrefix+"-")
 }
 
 func (s *Store[T]) Exists(ctx context.Context, id string) (bool, error) {

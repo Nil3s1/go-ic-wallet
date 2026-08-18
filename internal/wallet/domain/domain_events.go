@@ -3,36 +3,38 @@ package domain
 import "time"
 
 const (
-	EventBalanceAdded = "BalanceAddedDomainEvent"
-	EventApplyPayment = "ApplyPaymentDomainEvent"
-	EventCardCreated  = "CardCreatedDomainEvent"
+	EventBalanceAddedV1 = "BalanceAddedDomainEvent.V1"
+	EventApplyPaymentV1 = "ApplyPaymentDomainEvent.V1"
+	EventCardCreatedV1  = "CardCreatedDomainEvent.V1"
 )
 
-type CardCreatedDomainEvent struct {
+type CardCreatedDomainEventV1 struct {
 	CardNo         string
 	InitialBalance uint
 	CreatedAt      time.Time
 	ValidTo        time.Time
 }
 
-type BalanceAddedDomainEvent struct {
+type BalanceAddedDomainEventV1 struct {
 	BalanceAdded uint
 	ReferenceId  string
+	OccurredAt   time.Time
 }
 
-type ApplyPaymentDomainEvent struct {
+type ApplyPaymentDomainEventV1 struct {
 	Amount      uint
 	ReferenceId string
+	OccurredAt  time.Time
 }
 
-func (e CardCreatedDomainEvent) EventName() string {
-	return EventCardCreated
+func (e CardCreatedDomainEventV1) EventName() string {
+	return EventCardCreatedV1
 }
 
-func (e BalanceAddedDomainEvent) EventName() string {
-	return EventBalanceAdded
+func (e BalanceAddedDomainEventV1) EventName() string {
+	return EventBalanceAddedV1
 }
 
-func (e ApplyPaymentDomainEvent) EventName() string {
-	return EventApplyPayment
+func (e ApplyPaymentDomainEventV1) EventName() string {
+	return EventApplyPaymentV1
 }

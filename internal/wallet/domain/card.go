@@ -33,7 +33,7 @@ func NewCard(initialBalance uint) (*Card, error) {
 	createdAt := time.Now().UTC()
 	validTo := createdAt.AddDate(5, 0, 0)
 
-	event := CardCreatedDomainEvent{
+	event := CardCreatedDomainEventV1{
 		CardNo:         cardNo,
 		InitialBalance: initialBalance,
 		CreatedAt:      createdAt,
@@ -72,9 +72,10 @@ func (c *Card) AddBalance(value uint) error {
 
 	generatedReferenceID := uuid.New().String()
 
-	event := BalanceAddedDomainEvent{
+	event := BalanceAddedDomainEventV1{
 		BalanceAdded: value,
 		ReferenceId:  generatedReferenceID,
+		OccurredAt:   time.Now().UTC(),
 	}
 
 	c.ApplyEvent(event, c.applyEventFunction)
@@ -99,9 +100,10 @@ func (c *Card) ApplyPayment(amount uint, referenceID string) error {
 		return errors.New("nicht genug Balance auf der Karte. Bitte Karte aufladen!")
 	}
 
-	event := ApplyPaymentDomainEvent{
+	event := ApplyPaymentDomainEventV1{
 		Amount:      amount,
 		ReferenceId: referenceID,
+		OccurredAt:  time.Now().UTC(),
 	}
 
 	c.ApplyEvent(event, c.applyEventFunction)
@@ -111,15 +113,15 @@ func (c *Card) ApplyPayment(amount uint, referenceID string) error {
 
 func (c *Card) applyEventFunction(event kernel.DomainEvent) {
 	switch e := event.(type) {
-	case CardCreatedDomainEvent:
+	case CardCreatedDomainEventV1:
 		c.SetId(e.CardNo)
 		c.cardNo = e.CardNo
 		c.SetCreatedAt(e.CreatedAt)
 		c.validTo = e.ValidTo
 		c.currentBalance = e.InitialBalance
-	case BalanceAddedDomainEvent:
+	case BalanceAddedDomainEventV1:
 		c.currentBalance += e.BalanceAdded
-	case ApplyPaymentDomainEvent:
+	case ApplyPaymentDomainEventV1:
 		c.currentBalance -= e.Amount
 		if e.ReferenceId != "" {
 			c.processedReferenceIds[e.ReferenceId] = true

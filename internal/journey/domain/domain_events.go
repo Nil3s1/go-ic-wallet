@@ -3,37 +3,37 @@ package domain
 import "time"
 
 const (
-	EventJourneyLogCreated = "JourneyLogCreatedEvent"
-	EventJourneyStarted    = "JourneyStartedDomainEvent"
-	EventJourneyEnded      = "JourneyEndedDomainEvent"
+	EventJourneyLogCreatedV1 = "JourneyLogCreatedEvent.V1"
+	EventJourneyStartedV1    = "JourneyStartedDomainEvent.V1"
+	EventJourneyEndedV1      = "JourneyEndedDomainEvent.V1"
 )
 
-type JourneyLogCreatedDomainEvent struct {
+type JourneyLogCreatedDomainEventV1 struct {
 	MediaId   string
 	CreatedAt time.Time
 }
 
-type JourneyStartedDomainEvent struct {
+type JourneyStartedDomainEventV1 struct {
 	StartStation       string
 	StartTime          time.Time
 	JourneyReferenceId string
 }
 
-type JourneyEndedDomainEvent struct {
+type JourneyEndedDomainEventV1 struct {
 	EndStation        string
 	EndTime           time.Time
 	DistanceTravelled uint
 	Fare              uint
 }
 
-func (e JourneyLogCreatedDomainEvent) EventName() string {
-	return EventJourneyLogCreated
+func (e JourneyLogCreatedDomainEventV1) EventName() string {
+	return EventJourneyLogCreatedV1
 }
 
-func (e JourneyStartedDomainEvent) EventName() string {
-	return EventJourneyStarted
+func (e JourneyStartedDomainEventV1) EventName() string {
+	return EventJourneyStartedV1
 }
 
-func (e JourneyEndedDomainEvent) EventName() string {
-	return EventJourneyEnded
+func (e JourneyEndedDomainEventV1) EventName() string {
+	return EventJourneyEndedV1
 }

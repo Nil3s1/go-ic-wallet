@@ -2,6 +2,8 @@ package application
 
 import (
 	"context"
+
+	"github.com/Nil3s1/go-ic-wallet/internal/wallet/domain"
 )
 
 type HasSufficientBalanceQueryHandler struct {
@@ -15,5 +17,10 @@ func NewHasSufficientBalanceQueryHandler(repository CardProjectionRepository) *H
 }
 
 func (h *HasSufficientBalanceQueryHandler) Handle(ctx context.Context, query HasSufficientBalanceQuery) (bool, error) {
-	return h.repository.HasSufficientBalance(ctx, query.CardNo, query.Amount)
+	card, err := h.repository.GetByKey(ctx, query.CardNo)
+	if err != nil {
+		return false, err
+	}
+
+	return domain.HasSufficientBalance(card.CurrentBalance, query.Amount), nil
 }

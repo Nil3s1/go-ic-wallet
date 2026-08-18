@@ -11,18 +11,18 @@ import (
 )
 
 var journeyLogEventTypes = eventstore.EventTypeRegistry{
-	domain.EventJourneyLogCreated: func(data []byte) (kernel.DomainEvent, error) {
-		var e domain.JourneyLogCreatedDomainEvent
+	domain.EventJourneyLogCreatedV1: func(data []byte) (kernel.DomainEvent, error) {
+		var e domain.JourneyLogCreatedDomainEventV1
 		err := json.Unmarshal(data, &e)
 		return e, err
 	},
-	domain.EventJourneyStarted: func(data []byte) (kernel.DomainEvent, error) {
-		var e domain.JourneyStartedDomainEvent
+	domain.EventJourneyStartedV1: func(data []byte) (kernel.DomainEvent, error) {
+		var e domain.JourneyStartedDomainEventV1
 		err := json.Unmarshal(data, &e)
 		return e, err
 	},
-	domain.EventJourneyEnded: func(data []byte) (kernel.DomainEvent, error) {
-		var e domain.JourneyEndedDomainEvent
+	domain.EventJourneyEndedV1: func(data []byte) (kernel.DomainEvent, error) {
+		var e domain.JourneyEndedDomainEventV1
 		err := json.Unmarshal(data, &e)
 		return e, err
 	},

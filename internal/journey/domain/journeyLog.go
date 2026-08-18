@@ -29,7 +29,7 @@ func NewJourneyLog(mediaId string) (*JourneyLog, error) {
 
 	createdAt := time.Now().UTC()
 
-	event := JourneyLogCreatedDomainEvent{
+	event := JourneyLogCreatedDomainEventV1{
 		MediaId:   mediaId,
 		CreatedAt: createdAt,
 	}
@@ -94,7 +94,7 @@ func (jl *JourneyLog) StartJourney(startStation string) error {
 	startTime := time.Now().UTC()
 	referenceId := uuid.New().String()
 
-	event := JourneyStartedDomainEvent{
+	event := JourneyStartedDomainEventV1{
 		StartStation:       startStation,
 		StartTime:          startTime,
 		JourneyReferenceId: referenceId,
@@ -113,7 +113,7 @@ func (jl *JourneyLog) EndJourney(endStation string, cf CalculatedFare) error {
 		return errors.New("cannot end journey: no journey started for this card")
 	}
 
-	event := JourneyEndedDomainEvent{
+	event := JourneyEndedDomainEventV1{
 		EndStation:        endStation,
 		EndTime:           time.Now().UTC(),
 		DistanceTravelled: cf.Distance(),
@@ -126,12 +126,12 @@ func (jl *JourneyLog) EndJourney(endStation string, cf CalculatedFare) error {
 
 func (jl *JourneyLog) applyEventFunction(event kernel.DomainEvent) {
 	switch e := event.(type) {
-	case JourneyLogCreatedDomainEvent:
+	case JourneyLogCreatedDomainEventV1:
 		jl.SetId(e.MediaId)
 		jl.SetCreatedAt(e.CreatedAt)
 		jl.mediaId = e.MediaId
 		jl.isOnJourney = false
-	case JourneyStartedDomainEvent:
+	case JourneyStartedDomainEventV1:
 		jl.isOnJourney = true
 		jl.journeyReferenceId = e.JourneyReferenceId
 		jl.startStation = e.StartStation
@@ -140,7 +140,7 @@ func (jl *JourneyLog) applyEventFunction(event kernel.DomainEvent) {
 		jl.endTime = time.Time{}
 		jl.distanceTravelled = 0
 		jl.fare = 0
-	case JourneyEndedDomainEvent:
+	case JourneyEndedDomainEventV1:
 		jl.isOnJourney = false
 		jl.journeyReferenceId = ""
 		jl.endStation = e.EndStation
